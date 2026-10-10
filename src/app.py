@@ -10,9 +10,19 @@ import streamlit as st
 
 from config import SAMPLE_CSV
 from data_agent import ask, build_agent
+from llm import ollama_reachable, provider_label, resolve_provider
 
 st.set_page_config(page_title="Chat With Your Data", layout="wide")
 st.title("Chat With Your Data")
+
+provider = resolve_provider()
+st.sidebar.caption(f"LLM: {provider_label()}")
+if provider == "ollama" and not ollama_reachable():
+    st.sidebar.warning(
+        "Ollama isn't running, so chat answers are unavailable. "
+        "Start Ollama locally, or add a free Gemini key "
+        "(`GOOGLE_API_KEY`) and redeploy — the app picks it up automatically."
+    )
 
 
 @st.cache_resource

@@ -73,13 +73,25 @@ streamlit run src/app.py
 
 Open **http://localhost:8501**. The sample sales dataset loads automatically — upload your own CSV from the sidebar any time.
 
+## ☁️ Deploy on Streamlit Cloud (free)
+
+Ollama can't run in the cloud, so the deployed app uses Gemini (free tier key) — and it switches automatically:
+
+1. Get a free key at [Google AI Studio](https://aistudio.google.com/apikey)
+2. Sign in at [share.streamlit.io](https://share.streamlit.io) with GitHub → **New app**
+3. Repo: `x10sic/chat-with-your-data`, branch `main`, main file path: `src/app.py`
+4. **Advanced settings → Secrets** — paste the contents of [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example) with your real `GOOGLE_API_KEY`
+5. **Deploy**
+
+How the fallback works: when `LLM_PROVIDER=ollama` (the default) and no Ollama server answers but a `GOOGLE_API_KEY` is set, the app uses Gemini instead — no config change needed. Set `LLM_PROVIDER=gemini` explicitly if you want to skip the probe. The sidebar always shows which backend is active. Free-tier caveat: the app sleeps after inactivity and takes ~30s to wake on the next visit.
+
 ## ⚙️ Environment variables
 
 All settings live in `.env` (see `.env.example` — placeholders only, no keys committed):
 
 | Variable | Default | What it does |
 |---|---|---|
-| `LLM_PROVIDER` | `ollama` | `ollama` · `openai` · `gemini` (anything else falls back to Ollama) |
+| `LLM_PROVIDER` | `ollama` | `ollama` · `openai` · `gemini` — when `ollama` is unreachable and `GOOGLE_API_KEY` is set, Gemini is used automatically |
 | `OLLAMA_MODEL` | `llama3.1` | Model pulled via `ollama pull <model>` |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server address |
 | `OPENAI_API_KEY` | *(empty)* | Your OpenAI key — required when `LLM_PROVIDER=openai` |
@@ -99,6 +111,8 @@ chat-with-your-data/
 ├── data/
 │   └── sample_sales.csv  # synthetic demo dataset (30 orders)
 ├── .env.example          # config template (no real keys)
+├── .streamlit/
+│   └── secrets.toml.example  # Streamlit Cloud secrets template
 ├── requirements.txt
 └── README.md
 ```
